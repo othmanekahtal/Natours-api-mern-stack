@@ -52,4 +52,3 @@ exports.deleteUser = (request, response) => {
      */
   });
 };
-x;

@@ -1,17 +1,19 @@
 const { getAllUsers, createUser, getUser, updateUser, deleteUser } = require('../Controllers/User');
 
 const express = require('express');
-const Users = express.Router();
-
-Users
+const router = express.Router();
+// router.param('id', (request, response, next, value) => {
+//   console.log(`id is :${value}`);
+// });
+router
   .route('/')
   .get(getAllUsers)
   .post(createUser);
 
-Users
-  .route(':id/')
+router
+  .route('/:id/')
   .get(getUser)
   .patch(updateUser)
   .delete(deleteUser);
 
-module.exports = Users;
+module.exports = router;

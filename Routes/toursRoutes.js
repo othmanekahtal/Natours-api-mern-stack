@@ -1,16 +1,21 @@
 const { getAllTours, createTour, getTour, updateTour, deleteTour } = require('../Controllers/Tour');
 const express = require('express');
-const Tours = express.Router();
+const router = express.Router();
 
-Tours
+router.param('id', (req, res, next, value) => {
+  console.log(`the id is ${value}`);
+  next();
+});
+// you can us this method fr checking the IDs is valid or not
+router
   .route('/')
   .get(getAllTours)
   .post(createTour);
 
-Tours
+router
   .route('/:id/')
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
 
-module.exports = Tours;
+module.exports = router;
