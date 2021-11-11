@@ -10,10 +10,10 @@ server.use(morgan('dev'));
 server.use(express.static('public/'));
 // or:
 // express.static('public/');
-server.use((request, response, next) => {
-  console.log('my middleware executed!');
-  next();
-});
+// server.use((request, response, next) => {
+//   console.log('my middleware executed!');
+//   next();
+// });
 server.use('/api/v1/tours', Tours);
 server.use('/api/v1/users', Users);
 module.exports = server;

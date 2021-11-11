@@ -4,16 +4,15 @@ const { Schema } = database;
 const tourSchema = new Schema({
   title: {
     type: String,
-    required: [true, 'we need to specified the name of the tour'],
-    default: 'title'
+    required: [true, 'we need to specified the name of the tour']
   },
   name: {
     type: String,
     required: [true, 'error message here'],
-    default: 'none data'
+    unique: true
   }
 });
 // we need to create a model : mongodb we automatically create a collection using plural of the TourModel and convert them to lowercase
 
-module.exports = database.model('TourModel', tourSchema);
+module.exports = database.model('tour', tourSchema);
 
