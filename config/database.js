@@ -9,6 +9,8 @@ module.exports = function() {
     useNewUrlParser: true,
     useFindAndModify: false,
     useCreateIndex: true
-  }).then(() => console.log('connected successfully!')).catch(() => console.log('error happens!'));
+  })
+    .then(() => console.log('connected successfully!'))
+    .catch(() => console.log('error happens!'));
   return mongoose;
 };
