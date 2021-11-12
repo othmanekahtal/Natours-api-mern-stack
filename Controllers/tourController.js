@@ -2,7 +2,16 @@ const fs = require('fs');
 const tourModel = require('../models/tourModel');
 
 exports.getAllTours = async (request, response) => {
-  const tours = await tourModel.find({});
+  // we need to excluded some fields in query like a page and limit and ...
+  /*
+  * to implement operators in queries we do (example:duration>=12 - duration[gte]=12)
+  * */
+  let query = { ...request.query };
+  const excluded = ['limit', 'page', 'order', 'fields'];
+  excluded.forEach(el => delete query[el]);
+  query = JSON.stringify(query).replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+  console.log(`origin : ${JSON.stringify(request.query)} - new : ${query}`);
+  const tours = await tourModel.find(JSON.parse(query));
   try {
     response.status(200).json({ status: 'success', result: tours.length, data: tours });
   } catch (e) {
