@@ -1,5 +1,5 @@
 const tourModel = require('../models/tourModel');
-
+const QueryHandler = require('../utils/QueryHandler');
 // we need to excluded some fields in query like a page and limit and ...
 
 /*
@@ -10,31 +10,36 @@ const tourModel = require('../models/tourModel');
 * always add await when you interact with mongodb
 */
 exports.getAllTours = async (request, response) => {
-  let query = { ...request.query };
-  const excluded = ['limit', 'page', 'order', 'fields'];
-  const page = Number(request.query.page) || 1;
-  const limit = Number(request.query.limit) || 100;
-  const skip = (page - 1) * limit;
-  const numTours = await tourModel.countDocuments();
-  excluded.forEach(el => delete query[el]);
-  query = JSON.stringify(query).replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
-  console.log(`origin : ${JSON.stringify(request.query)} - new : ${query}`);
+  // let query = { ...request.query };
+  // const excluded = ['limit', 'page', 'order', 'fields'];
+  // const page = Number(request.query.page) || 1;
+  // const limit = Number(request.query.limit) || 100;
+  // const skip = (page - 1) * limit;
+  // const numTours = await tourModel.countDocuments();
+  // excluded.forEach(el => delete query[el]);
+  // query = JSON.stringify(query).replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+  // console.log(`origin : ${JSON.stringify(request.query)} - new : ${query}`);
+  //   let prep = tourModel.find(JSON.parse(query));
+  //   if (request.query.order) {
+  //     prep.sort(request.query.order.split(',').join(' '));
+  //   } else {
+  //     // sorted by date the newest to oldest
+  //     prep.sort('-createdAt');
+  //   }
+  //   if (request.query.fields) {
+  //     prep = prep.select(request.query.fields.split(',').join(' '));
+  //   } else {
+  //     prep = prep.select('-__v');
+  //   }
+  //   prep = prep.skip(skip).limit(limit);
+  //   if (request.query.page && skip >= numTours) new Error('This page does not exists !');
   try {
-    let prep = tourModel.find(JSON.parse(query));
-    if (request.query.order) {
-      prep.sort(request.query.order.split(',').join(' '));
-    } else {
-      // sorted by date the newest to oldest
-      prep.sort('-createdAt');
-    }
-    if (request.query.fields) {
-      prep = prep.select(request.query.fields.split(',').join(' '));
-    } else {
-      prep = prep.select('-__v');
-    }
-    prep = prep.skip(skip).limit(limit);
-    if (request.query.page && skip >= numTours) new Error('This page does not exists !');
-    const tours = await prep;
+    let prep = new QueryHandler(tourModel.find(), request.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tours = await prep.query;
     response.status(200).json({ status: 'success', result: tours.length, data: tours });
   } catch (e) {
     response.status(500).json({
