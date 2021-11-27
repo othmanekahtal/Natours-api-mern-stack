@@ -17,6 +17,7 @@ class QueryHandler {
     excluded.forEach(el => delete query[el]);
     query = JSON.parse(JSON.stringify(query).replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`));
     this.#query = this.#query.find(query);
+
     return this;
   }
 
@@ -26,8 +27,8 @@ class QueryHandler {
     } else {
       // sorted by date the newest to oldest
       this.#query = this.#query = this.#query.sort('-createdAt');
-      return this;
     }
+    return this;
   }
 
   limitFields() {
@@ -35,8 +36,8 @@ class QueryHandler {
       this.#query = this.#query.select(this.#queryString.fields.split(',').join(' '));
     } else {
       this.#query = this.#query.select('-__v');
-      return this;
     }
+    return this;
   }
 
   paginate() {

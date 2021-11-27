@@ -4,7 +4,8 @@ const {
   getTour,
   updateTour,
   getTopAlias,
-  deleteTour
+  deleteTour,
+  getStats
 } = require('../Controllers/tourController');
 const express = require('express');
 const router = express.Router();
@@ -15,16 +16,19 @@ router.param('id', (req, res, next, value) => {
 });
 // you can us this method fr checking the IDs is valid or not
 router
+  .route('/top-5-cheap')
+  .get(getTopAlias, getAllTours);
+
+router.route('/tours-stats').get(getStats);
+router
   .route('/')
   .get(getAllTours)
   .post(createTour);
-router
-  .route('/top-5-cheap')
-  .get(getTopAlias, getAllTours);
-module.exports = router;
 router
   .route('/:id/')
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
+
+module.exports = router;
 
