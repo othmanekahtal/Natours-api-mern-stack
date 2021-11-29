@@ -1,7 +1,8 @@
 const database = require('../config/database.js')();
 const { Schema } = database;
+const { slug, find } = require('../hooks/modelMiddleware');
 // we need to getting schema class in mongoose:
-const tourSchema = new Schema(
+tourSchema = new Schema(
   {
     name: {
       type: String,
@@ -75,10 +76,23 @@ const tourSchema = new Schema(
     startDates: [Date],
     secretTour: {
       type: Boolean,
+      select: false,
       default: false
     }
   }
-);
+  , {
+    toJSON: {
+      virtuals: true
+    },
+    toObject: { virtuals: true }
+  });
+tourSchema.virtual('duration-week').get(function() {
+  return this.duration / 7;
+});
+// we add slug to the model
+tourSchema.pre('save', slug);
+// any thing start with find (findOne,findByID etc...)
+tourSchema.pre(/^find/, find);
 // we need to create a model : mongodb we automatically create a collection using plural of the TourModel and convert them to lowercase
 
 module.exports = database.model('tour', tourSchema);
