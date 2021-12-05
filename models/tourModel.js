@@ -1,6 +1,6 @@
 const database = require('../config/database.js')();
 const { Schema } = database;
-const { slug, find } = require('../hooks/modelMiddleware');
+const { slug, find, aggregate } = require('../hooks/modelMiddleware');
 // we need to getting schema class in mongoose:
 tourSchema = new Schema(
   {
@@ -91,9 +91,9 @@ tourSchema.virtual('duration-week').get(function() {
 });
 // we add slug to the model
 tourSchema.pre('save', slug);
-// any thing start with find (findOne,findByID etc...)
+// anything start with find (findOne,findByID etc...)
 tourSchema.pre(/^find/, find);
 // we need to create a model : mongodb we automatically create a collection using plural of the TourModel and convert them to lowercase
-
+tourSchema.pre('aggregate', aggregate);
 module.exports = database.model('tour', tourSchema);
 

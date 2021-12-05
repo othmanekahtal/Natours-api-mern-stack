@@ -1,10 +1,10 @@
 const tourModel = require('../models/tourModel');
 const QueryHandler = require('../utils/QueryHandler');
-// we need to excluded some fields in query like a page and limit and ...
+// we need to exclude some fields in query like a page and limit and ...
 
 /*
 * to implement operators in queries we do (example:duration>=12 - duration[gte]=12)
-* sorting in moongose is very simple : asc + and desc -
+* sorting in mongoose is very simple : asc + and desc -
 * TO LIMIT FIELDS AND EXCLUDED IT YOU NEED TO ADD - IN SELECT
 * TO HIDE FIELDS YOU NEED TO ADD SELECT:FALSE IN MODEL
 * always add await when you interact with mongodb
@@ -60,7 +60,7 @@ exports.updateTour = async (request, response) => {
   const id = request.params.id;
   try {
     const res = await tourModel.findByIdAndUpdate(id, request.body, { new: true, runValidators: true });
-    // findById only for getting data with Id, we have also findOne
+    // findById only for getting data with ID,we have also findOne
     response.status(200).json({ status: 'success', data: res });
   } catch (e) {
     response.status(404).json({ status: 'fail', data: e });
