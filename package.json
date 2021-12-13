@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
-    "debug": "ndb server.js",
+    "debug": "ndb .",
     "command": "node dev-data/data/comands.js"
   },
   "author": "",

@@ -3,7 +3,8 @@ const morgan = require('morgan');
 const server = express();
 const Tours = require('./Routes/toursRoutes');
 const Users = require('./Routes/usersRoutes');
-const errorHandler = require('./utils/errorHandler.js');
+const errorHandler = require('./utils/errorHandler');
+const errorHandle = require('./Controllers/errorController');
 server.use(express.json());
 // for dev only :
 server.use(morgan('dev'));
@@ -17,28 +18,13 @@ server.use('/api/v1/users', Users);
  */
 
 server.all('*', function(req, res, next) {
-  // res.status(404).json({
-  //   status: 'error',
-  //   message: `Can't find ${req.originalUrl} on this server`
-  // });
-  // const error = new Error(`Can't find ${req.originalUrl} on this server`);
-  // error.status = 'failed';
-  // error.statusCode = 404;
-  // next(error);
-  next(errorHandler.error404({ message: `Can't find ${req.originalUrl} on this server` }));
+  next(new errorHandler({ message: `Can't find ${req.originalUrl} on this server`, statusCode: 404 }));
 });
 
 /*
 we create a central middleware for handle all errors
  */
-server.use((error, req, res, next) => {
-  error.statusCode ||= 500;
-  error.status ||= 'error';
-  res.status(error.statusCode).json({
-    status: error.status,
-    message: error.message
-  });
-});
+server.use(errorHandle);
 /**
  * @type {*|Express}
  * if we pass any parameter to next() function automatically express will know that was an error

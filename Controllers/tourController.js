@@ -23,7 +23,7 @@ exports.getAllTours = async (request, response, next) => {
     console.log(tours);
     response.status(200).json({ status: 'success', result: tours.length, data: tours });
   } catch (e) {
-    next(errorHandler.error500({ message: `The resource ${request.originalUrl} not found` }));
+    next(new errorHandler({ message: `The resource ${request.originalUrl} not found`, statusCode: 404 }));
   }
 };
 
@@ -36,7 +36,7 @@ exports.createTour = async (request, response, next) => {
       data: new_tour
     });
   } catch (e) {
-    next(errorHandler.error500({ message: `error happen` }));
+    next(new errorHandler({ message: `error happen`, statusCode: 500 }));
   }
 };
 
@@ -48,7 +48,7 @@ exports.getTour = async (request, response, next) => {
     if (!res) response.status(404).json({ status: 'fail', data: 'not found' });
     response.status(200).json({ status: 'success', data: res });
   } catch (e) {
-    next(errorHandler.error404({ message: `The resource ${request.originalUrl} not found` }));
+    next(new errorHandler({ message: `The resource ${request.originalUrl} not found`, statusCode: 404 }));
   }
 };
 
@@ -59,7 +59,7 @@ exports.updateTour = async (request, response, next) => {
     // findById only for getting data with ID,we have also findOne
     response.status(200).json({ status: 'success', data: res });
   } catch (e) {
-    next(errorHandler.error404({ message: `The resource ${request.originalUrl} not found` }));
+    next(new errorHandler({ message: `The resource ${request.originalUrl} not found`, statusCode: 404 }));
   }
 };
 
@@ -70,7 +70,7 @@ exports.deleteTour = async (request, response, next) => {
     // findById only for getting data with Id, we have also findOne
     response.status(204).send(null);
   } catch (e) {
-    next(errorHandler.error404({ message: `The resource ${request.originalUrl} not found` }));
+    next(new errorHandler({ message: `The resource ${request.originalUrl} not found`, statusCode: 404 }));
   }
 };
 exports.getTopAlias = async (req, res, next) => {
@@ -99,7 +99,7 @@ exports.getStats = async (request, response, next) => {
     );
     response.status(200).json({ status: 'success', result: stats });
   } catch (e) {
-    next(errorHandler.error500({ message: `error happen` }));
+    next(new errorHandler({ message: `error happen`, statusCode: 500 }));
   }
 };
 exports.getMonthlyPlan = async (req, res, next) => {
@@ -139,6 +139,6 @@ exports.getMonthlyPlan = async (req, res, next) => {
     }]);
     res.status(200).json({ status: 'success', length: data.length, result: data });
   } catch (e) {
-    next(errorHandler.error500({ message: `error happen` }));
+    next(new errorHandler({ message: `error happen`, statusCode: 500 }));
   }
 };
