@@ -1,5 +1,7 @@
 const tourModel = require('../models/tourModel');
-const QueryHandler = require('../utils/QueryHandler');
+const QueryHandler = require('../utils/queryHandler');
+const errorHandler = require('../utils/errorHandler.js');
+
 // we need to exclude some fields in query like a page and limit and ...
 
 /*
@@ -9,7 +11,7 @@ const QueryHandler = require('../utils/QueryHandler');
 * TO HIDE FIELDS YOU NEED TO ADD SELECT:FALSE IN MODEL
 * always add await when you interact with mongodb
 */
-exports.getAllTours = async (request, response) => {
+exports.getAllTours = async (request, response, next) => {
   try {
 
     let prep = new QueryHandler(tourModel.find(), request.query)
@@ -21,15 +23,12 @@ exports.getAllTours = async (request, response) => {
     console.log(tours);
     response.status(200).json({ status: 'success', result: tours.length, data: tours });
   } catch (e) {
-    response.status(500).json({
-      message: 'fail',
-      data: e
-    });
+    next(errorHandler.error500({ message: `The resource ${request.originalUrl} not found` }));
   }
 };
 
 
-exports.createTour = async (request, response) => {
+exports.createTour = async (request, response, next) => {
   try {
     const new_tour = await tourModel.create(request.body);
     response.status(201).json({
@@ -37,14 +36,11 @@ exports.createTour = async (request, response) => {
       data: new_tour
     });
   } catch (e) {
-    response.status(500).json({
-      status: 'fail',
-      data: e
-    });
+    next(errorHandler.error500({ message: `error happen` }));
   }
 };
 
-exports.getTour = async (request, response) => {
+exports.getTour = async (request, response, next) => {
   const id = request.params.id;
   try {
     const res = await tourModel.findById(id);
@@ -52,29 +48,29 @@ exports.getTour = async (request, response) => {
     if (!res) response.status(404).json({ status: 'fail', data: 'not found' });
     response.status(200).json({ status: 'success', data: res });
   } catch (e) {
-    response.status(500).json({ status: 'fail', data: e });
+    next(errorHandler.error404({ message: `The resource ${request.originalUrl} not found` }));
   }
 };
 
-exports.updateTour = async (request, response) => {
+exports.updateTour = async (request, response, next) => {
   const id = request.params.id;
   try {
     const res = await tourModel.findByIdAndUpdate(id, request.body, { new: true, runValidators: true });
     // findById only for getting data with ID,we have also findOne
     response.status(200).json({ status: 'success', data: res });
   } catch (e) {
-    response.status(404).json({ status: 'fail', data: e });
+    next(errorHandler.error404({ message: `The resource ${request.originalUrl} not found` }));
   }
 };
 
-exports.deleteTour = async (request, response) => {
+exports.deleteTour = async (request, response, next) => {
   const id = request.params.id;
   try {
     await tourModel.findByIdAndDelete(id);
     // findById only for getting data with Id, we have also findOne
     response.status(204).send(null);
   } catch (e) {
-    response.status(404).json({ status: 'fail', data: e });
+    next(errorHandler.error404({ message: `The resource ${request.originalUrl} not found` }));
   }
 };
 exports.getTopAlias = async (req, res, next) => {
@@ -83,7 +79,7 @@ exports.getTopAlias = async (req, res, next) => {
   next();
 };
 
-exports.getStats = async (request, response) => {
+exports.getStats = async (request, response, next) => {
   try {
     let stats = await tourModel.aggregate(
       [
@@ -103,10 +99,10 @@ exports.getStats = async (request, response) => {
     );
     response.status(200).json({ status: 'success', result: stats });
   } catch (e) {
-    response.status(404).json({ status: 'fail', data: e });
+    next(errorHandler.error500({ message: `error happen` }));
   }
 };
-exports.getMonthlyPlan = async (req, res) => {
+exports.getMonthlyPlan = async (req, res, next) => {
   try {
     const year = +req.params.year;
     console.log(year);
@@ -143,6 +139,6 @@ exports.getMonthlyPlan = async (req, res) => {
     }]);
     res.status(200).json({ status: 'success', length: data.length, result: data });
   } catch (e) {
-    res.status(404).json({ status: 'fail', data: e });
+    next(errorHandler.error500({ message: `error happen` }));
   }
 };

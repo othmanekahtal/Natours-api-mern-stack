@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon server.js",
+    "debug": "ndb server.js",
     "command": "node dev-data/data/comands.js"
   },
   "author": "",
@@ -14,7 +15,10 @@
     "express": "^4.17.1",
     "mongoose": "5",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.13",
     "slugify": "^1.6.3"
+  },
+  "devDependencies": {
+    "ndb": "^1.1.5",
+    "nodemon": "^2.0.13"
   }
 }
