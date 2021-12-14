@@ -4,7 +4,7 @@ const server = express();
 const Tours = require('./Routes/toursRoutes');
 const Users = require('./Routes/usersRoutes');
 const errorHandler = require('./utils/errorHandler');
-const errorHandle = require('./Controllers/errorController');
+const errorHandle = require('./Controllers/globalErrorHandler');
 server.use(express.json());
 // for dev only :
 server.use(morgan('dev'));

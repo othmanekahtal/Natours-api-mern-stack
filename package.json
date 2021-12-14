@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js",
-    "debug": "ndb .",
+    "start:dev": "nodemon server.js",
+    "start:production": "NODE_ENV=production nodemon server.js",
+    "debug:dev": "ndb .",
+    "debug:production": "NODE_ENV=production ndb .",
     "command": "node dev-data/data/comands.js"
   },
   "author": "",
