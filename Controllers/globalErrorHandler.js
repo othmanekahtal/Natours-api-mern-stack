@@ -1,5 +1,4 @@
 const ErrorHandler = require('./../utils/errorHandler');
-const { json } = require('express');
 const errorDev = (error, res) => res.status(error.statusCode).json({
   status: error.status,
   message: error.message,
@@ -37,14 +36,19 @@ module.exports = (error, req, res, next) => {
       });
     }
     // to identify errors happens in duplicate unique field code = 11000
-
     if (err.code === 11000) {
-      console.log(err.message);
       err = new ErrorHandler({
         message: Object.entries(err.keyValue).length === 1 ? `The field with name '${Object.entries(err.keyValue).map(el => `${el[0]} : ${el[1]}`).join(' | ')}' is duplicated ` : `The fields with names '${Object.entries(err.keyValue).map(el => `${el[0]} : ${el[1]}`).join(' | ')}' are duplicated `,
         statusCode: 400
       });
-
+    }
+    if (err.name === 'ValidationError') {
+      const errors = err.errors;
+      const message = Object.entries(errors).map(el => `${el[0]}:${el[1].message}`).join(' & ');
+      err = new ErrorHandler({
+        statusCode: 400,
+        message
+      });
     }
     errorProd(err, res);
   }
