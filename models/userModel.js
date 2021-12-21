@@ -1,11 +1,12 @@
-const database = require('../config/database.js')();
 const validator = require('validator');
-const { Schema } = database;
-const { slug, find, aggregate } = require('../hooks/modelMiddleware');
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+const { hashPassword } = require('../hooks/ModelsUtils');
+
 // we need to getting schema class in mongoose:
 const userSchema = new Schema(
   {
-    name: {
+    username: {
       type: String,
       required: [true, 'An user must have a username'],
       // unique: true,
@@ -29,9 +30,21 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: [true, 'An user must have an password'],
-      trim: true,
       maxlength: [26, 'A password must have less or equal then 26 characters'],
-      minlength: [10, 'An password must have more or equal then 10 characters']
+      minlength: [10, 'An password must have more or equal then 10 characters'],
+      select: false
+    },
+    confirmPassword: {
+      type: String,
+      required: [true, 'please confirm your password'],
+      maxlength: [26, 'A password must have less or equal then 26 characters'],
+      minlength: [10, 'An password must have more or equal then 10 characters'],
+      validate: {
+        message: 'Passwords not the same !',
+        validator: function(element) {
+          return this.password === element;
+        }
+      }
     },
     imageCover: {
       type: String,
@@ -43,22 +56,7 @@ const userSchema = new Schema(
       select: false
     }
   }
-  // {
-  //   toJSON: {
-  //     virtuals: true
-  //   },
-  //   toObject: {
-  //     virtuals: true
-  //   }
-  // }
 );
-userSchema.virtual('duration-week').get(function() {
-  return this.duration / 7;
-});
-// we add slug to the model
-userSchema.pre('save', slug);
-// anything start with find (findOne,findByID etc...)
-userSchema.pre(/^find/, find);
-// we need to create a model : mongodb we automatically create a collection using plural of the TourModel and convert them to lowercase
-userSchema.pre('aggregate', aggregate);
-module.exports = database.model('user', userSchema);
+userSchema.pre('save', hashPassword);
+// error happens when we import function in another file
+module.exports = mongoose.model('user', userSchema);

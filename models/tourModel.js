@@ -1,6 +1,6 @@
-const database = require('../config/database.js')();
-const { Schema } = database;
-const { slug, find, aggregate } = require('../hooks/modelMiddleware');
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+const { slug, find, aggregate } = require('../hooks/ModelsUtils');
 // we need to getting schema class in mongoose:
 const tourSchema = new Schema(
   {
@@ -46,7 +46,7 @@ const tourSchema = new Schema(
     priceDiscount: {
       type: Number,
       validate: {
-        validator: function (val) {
+        validator: function(val) {
           // this only points to current doc on NEW document creation
           return val < this.price;
         },
@@ -86,7 +86,7 @@ const tourSchema = new Schema(
     },
     toObject: { virtuals: true }
   });
-tourSchema.virtual('duration-week').get(function () {
+tourSchema.virtual('duration-week').get(function() {
   return this.duration / 7;
 });
 // we add slug to the model
@@ -95,4 +95,4 @@ tourSchema.pre('save', slug);
 tourSchema.pre(/^find/, find);
 // we need to create a model : mongodb we automatically create a collection using plural of the TourModel and convert them to lowercase
 tourSchema.pre('aggregate', aggregate);
-module.exports = database.model('tour', tourSchema);
+module.exports = mongoose.model('tour', tourSchema);

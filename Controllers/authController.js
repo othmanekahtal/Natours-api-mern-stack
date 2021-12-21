@@ -2,6 +2,7 @@ const AsyncCatch = require('../utils/asyncCatch');
 const userModel = require('../models/userModel');
 
 exports.login = AsyncCatch(async (req, res) => {
+  res.status(200).json({ ...req.body });
 });
 
 exports.signup = AsyncCatch(async (req, res) => {
