@@ -25,7 +25,6 @@ exports.aggregate = function(next) {
 };
 exports.hashPassword = async function(next) {
   this.password = await bcrypt.hash(this.password, 12);
-  console.log(this.password);
   this.confirmPassword = undefined;
   next();
 };
