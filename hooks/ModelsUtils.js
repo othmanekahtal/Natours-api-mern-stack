@@ -29,3 +29,7 @@ exports.hashPassword = async function(next) {
   this.confirmPassword = undefined;
   next();
 };
+exports.correctPassword = async ({
+                                   candidatePassword,
+                                   userPassword
+                                 }) => await bcrypt.compare(userPassword, candidatePassword);

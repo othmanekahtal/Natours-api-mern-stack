@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-
+const port = process.env.PORT || 8080;
 dotenv.config({ path: './.env' });
 process.on('uncaughtException', error => {
   console.log(`${error.name} : ${error.message}`);
@@ -17,8 +17,8 @@ mongoose
   })
   .then(() => console.log('DB connection successful!'));
 const server = require('./index');
-const app = server.listen(8080, () => {
-  console.log('listen on port 8080...');
+const app = server.listen(port, () => {
+  console.log(`listen on port ${8080}...`);
 });
 
 process.on('unhandledRejection', error => {

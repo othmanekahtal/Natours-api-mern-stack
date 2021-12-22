@@ -1,7 +1,7 @@
 const validator = require('validator');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const { hashPassword } = require('../hooks/ModelsUtils');
+const { hashPassword, correctPassword } = require('../hooks/ModelsUtils');
 
 // we need to getting schema class in mongoose:
 const userSchema = new Schema(
@@ -58,5 +58,6 @@ const userSchema = new Schema(
   }
 );
 userSchema.pre('save', hashPassword);
+userSchema.methods.correctPassword = correctPassword;
 // error happens when we import function in another file
 module.exports = mongoose.model('user', userSchema);
