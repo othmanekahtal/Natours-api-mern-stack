@@ -4,13 +4,14 @@ const server = express();
 const Tours = require('./Routes/toursRoutes');
 const Users = require('./Routes/usersRoutes');
 const Auth = require('./Routes/authRoutes');
+const { protect } = require('./Controllers/authController');
 const errorHandler = require('./utils/errorHandler');
 const errorHandle = require('./Controllers/globalErrorHandler');
 server.use(express.json());
 // for dev only :
 server.use(morgan('dev'));
 server.use(express.static('public/'));
-server.use('/api/v1/tours', Tours);
+server.use('/api/v1/tours', protect, Tours);
 server.use('/api/v1/users', Users);
 server.use('/api/v1', Auth);
 // if cycle not finished yet At this moment , we have a router that handled in the previous middlewares

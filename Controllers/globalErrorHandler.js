@@ -50,6 +50,12 @@ module.exports = (error, req, res, next) => {
         message
       });
     }
+    if (err.name === 'JsonWebTokenError') {
+      err = new ErrorHandler({
+        statusCode: 401,
+        message: 'You are not authorized !'
+      });
+    }
     errorProd(err, res);
   }
 };
