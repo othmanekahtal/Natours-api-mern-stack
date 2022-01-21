@@ -56,7 +56,7 @@ exports.protect = AsyncCatch(async (req, res, next) => {
     token = req.headers.authorization.split(' ').at(-1);
   }
   if (!token) {
-    return new ErrorHandler({ message: 'You\'re not authorized !', statusCode: 401 });
+    next(new ErrorHandler({ message: 'You\'re not authorized !', statusCode: 401 }));
   }
   const decodedToken = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   const userFresh = await userModel.findById(decodedToken.id);
@@ -64,11 +64,14 @@ exports.protect = AsyncCatch(async (req, res, next) => {
     message: 'The user belonging to this token does no longer exist.',
     statusCode: 401
   }));
-  if (userFresh.changedAfter(decodedToken.iat)) {
-    return next(new ErrorHandler({ message: 'You changed password , you need to login again!', statusCode: 401 }));
+  if (!userFresh.changedAfter({ date: decodedToken.iat })) {
+    next(new ErrorHandler({ message: 'You changed password , you need to login again!', statusCode: 401 }));
   }
   req.user = userFresh;
   next();
-  // some cases we need to promisify function , node actually has a build-in function in util model
-  // always try to convert function to asynchronous functions : don't block event loop
 });
+exports.onlyFor = (...roles) => (req, res, next) => {
+  if (!roles.includes(req.user.role)) {
+
+  }
+};

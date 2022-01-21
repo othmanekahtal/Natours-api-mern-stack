@@ -20,11 +20,15 @@ const userSchema = new Schema({
     trim: true,
     maxlength: [40, 'An email must have less or equal then 40 characters'],
     minlength: [10, 'An email must have more or equal then 10 characters'],
-    // validation:validator.isEm
     validate: {
       message: 'An email is not valid !',
       validator: validator.isEmail
     }
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'guide', 'lead-guide', 'user'],
+    default: 'user'
   },
   password: {
     type: String,
