@@ -1,5 +1,8 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const slugify = require('slugify');
+const { Schema } = require('mongoose');
+const { password } = require('./ModelsUtils');
 exports.find = function(next) {
   this.find({ secretTour: { $ne: true } });
   next();
@@ -24,6 +27,8 @@ exports.aggregate = function(next) {
   next();
 };
 exports.hashPassword = async function(next) {
+  // Only run this function if password was actually modified
+  if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   this.confirmPassword = undefined;
   next();
@@ -40,4 +45,13 @@ exports.changedAfter = async ({ date }) => {
     return parsedDate > date;
   }
   return false;
+};
+exports.createPasswordResetToken = function() {
+  const resetTokenUser = crypto.randomBytes(32).toString('hex');
+  this.resetToken = crypto
+    .createHash('sha256')
+    .update(resetTokenUser)
+    .digest('hex');
+  this.resetTokenExpiration = Date.now() + 10 * 60 * 1000;
+  return resetTokenUser;
 };

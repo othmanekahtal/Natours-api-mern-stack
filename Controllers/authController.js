@@ -72,6 +72,24 @@ exports.protect = AsyncCatch(async (req, res, next) => {
 });
 exports.onlyFor = (...roles) => (req, res, next) => {
   if (!roles.includes(req.user.role)) {
-
+    return next(
+      new ErrorHandler({ message: 'You do not have permission to perform this action', statusCode: 403 })
+    );
   }
+  next();
 };
+exports.forgotPassword = AsyncCatch(async (req, res, next) => {
+  // 1- get user based on POSTed email
+  const user = await userModel.findOne({ email: req.body.email });
+  if (!user) return next(new ErrorHandler({ message: 'There is no user with email address', statusCode: 404 }));
+  // 2-generate the random reset token
+  const resetToken = user.createPasswordResetToken();
+  console.log(resetToken);
+  await user.save({ validateBeforeSave: false });
+  res.status(200).json(
+    { 'status': 'success', 'message': 'check your email' }
+  );
+});
+exports.resetPassword = AsyncCatch(async (req, res, next) => {
+  console.log(req);
+});

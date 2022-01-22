@@ -9,12 +9,7 @@ process.on('uncaughtException', error => {
 const database = process.env.HOSTED_DATABASE.replace('<password>', process.env.DATABASE_PASSWORD);
 
 mongoose
-  .connect(database, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true
-  })
+  .connect(database)
   .then(() => console.log('DB connection successful!'));
 const server = require('./index');
 const app = server.listen(port, () => {
