@@ -18,7 +18,6 @@ exports.login = AsyncCatch(async (req, res, next) => {
       })
     );
   let response = await userModel.findOne({ email })?.select('+password');
-  console.log(response);
   const passwordsMatch = await response?.correctPassword({
     candidatePassword: response.password,
     userPassword: password
@@ -157,7 +156,6 @@ exports.resetPassword = AsyncCatch(async (req, res, next) => {
   user.updatePasswordAt = Date.now();
   user.password = password;
   user.confirmPassword = confirmPassword;
-  console.log(user);
   const newUser = await user.save();
   const jwtToken = await generateToken(newUser._id);
   res.status(201).json({
