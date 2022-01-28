@@ -5,9 +5,17 @@ const ErrorHandler = require('./../utils/errorHandler');
 const { promisify } = require('util');
 const mail = require('./../utils/mail');
 const crypto = require('crypto');
-const generateToken = async (id) => await jwt.sign({ id }, process.env.JWT_SECRET, {
+const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, {
   expiresIn: process.env.JWT_EXPIRE
 });
+const sendTokenResponse = (response, user, statusCode) => {
+  user.password = undefined;
+  return response.status(statusCode).json({
+    status: 'success',
+    token: generateToken(user),
+    user
+  });
+};
 exports.login = AsyncCatch(async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password)
@@ -22,11 +30,8 @@ exports.login = AsyncCatch(async (req, res, next) => {
     candidatePassword: response.password,
     userPassword: password
   });
-  if (response && passwordsMatch)
-    return res.status(201).json({
-      status: 'success',
-      token: await generateToken(response._id)
-    });
+  (response && passwordsMatch) && sendTokenResponse(res, response, 200);
+
   next(
     new ErrorHandler({
       message: 'password or email is not correct',
@@ -39,13 +44,7 @@ exports.signup = AsyncCatch(async (req, res) => {
   const user = req.body;
   user.role = undefined;
   let response = await userModel.create(user);
-  response.password = undefined;
-  const token = await generateToken(response._id);
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: response
-  });
+  sendTokenResponse(res, response, 201);
 });
 
 exports.protect = AsyncCatch(async (req, res, next) => {
@@ -156,10 +155,21 @@ exports.resetPassword = AsyncCatch(async (req, res, next) => {
   user.updatePasswordAt = Date.now();
   user.password = password;
   user.confirmPassword = confirmPassword;
-  const newUser = await user.save();
-  const jwtToken = await generateToken(newUser._id);
-  res.status(201).json({
-    status: 'success',
-    token: jwtToken
-  });
+  await user.save();
+  sendTokenResponse(res, user, 200);
+});
+exports.updatePassword = AsyncCatch(async (req, res, next) => {
+  const { id, password, passwordConfirm, passwordCurrent } = req.body;
+  const user = await userModel.findById(id).select('+password');
+  if (!(await user.correctPassword(passwordCurrent, user.password))) {
+    return next(new ErrorHandler({
+      message: 'Your current password is wrong.',
+      statusCode: 401
+    }));
+
+  }
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  await user.save();
+  sendTokenResponse(res, user, 200);
 });
