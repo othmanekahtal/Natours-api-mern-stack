@@ -4,35 +4,34 @@ const jwt = require('jsonwebtoken');
 const ErrorHandler = require('./../utils/errorHandler');
 const { promisify } = require('util');
 const mail = require('./../utils/mail');
-const generateToken = async (id) => {
-  return await jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
-};
+const crypto = require('crypto');
+const generateToken = async (id) => await jwt.sign({ id }, process.env.JWT_SECRET, {
+  expiresIn: process.env.JWT_EXPIRE
+});
 exports.login = AsyncCatch(async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password)
     return next(
       new ErrorHandler({
         message: 'provide email and password !',
-        statusCode: 400,
+        statusCode: 400
       })
     );
   let response = await userModel.findOne({ email })?.select('+password');
   console.log(response);
   const passwordsMatch = await response?.correctPassword({
     candidatePassword: response.password,
-    userPassword: password,
+    userPassword: password
   });
   if (response && passwordsMatch)
     return res.status(201).json({
       status: 'success',
-      token: await generateToken(response._id),
+      token: await generateToken(response._id)
     });
   next(
     new ErrorHandler({
       message: 'password or email is not correct',
-      statusCode: 401,
+      statusCode: 401
     })
   );
 });
@@ -46,7 +45,7 @@ exports.signup = AsyncCatch(async (req, res) => {
   res.status(201).json({
     status: 'success',
     token,
-    data: response,
+    data: response
   });
 });
 
@@ -61,7 +60,7 @@ exports.protect = AsyncCatch(async (req, res, next) => {
   }
   if (!token) {
     next(
-      new ErrorHandler({ message: "You're not authorized !", statusCode: 401 })
+      new ErrorHandler({ message: 'You\'re not authorized !', statusCode: 401 })
     );
   }
   const decodedToken = await promisify(jwt.verify)(
@@ -73,14 +72,14 @@ exports.protect = AsyncCatch(async (req, res, next) => {
     next(
       new ErrorHandler({
         message: 'The user belonging to this token does no longer exist.',
-        statusCode: 401,
+        statusCode: 401
       })
     );
   if (!userFresh.changedAfter({ date: decodedToken.iat })) {
     next(
       new ErrorHandler({
         message: 'You changed password , you need to login again!',
-        statusCode: 401,
+        statusCode: 401
       })
     );
   }
@@ -89,17 +88,17 @@ exports.protect = AsyncCatch(async (req, res, next) => {
 });
 exports.onlyFor =
   (...roles) =>
-  (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return next(
-        new ErrorHandler({
-          message: 'You do not have permission to perform this action',
-          statusCode: 403,
-        })
-      );
-    }
-    next();
-  };
+    (req, res, next) => {
+      if (!roles.includes(req.user.role)) {
+        return next(
+          new ErrorHandler({
+            message: 'You do not have permission to perform this action',
+            statusCode: 403
+          })
+        );
+      }
+      next();
+    };
 exports.forgotPassword = AsyncCatch(async (req, res, next) => {
   // 1- get user based on POSTed email
   const email = req.body.email;
@@ -108,7 +107,7 @@ exports.forgotPassword = AsyncCatch(async (req, res, next) => {
     return next(
       new ErrorHandler({
         message: 'There is no user with email address',
-        statusCode: 404,
+        statusCode: 404
       })
     );
   // 2-generate the random reset token
@@ -123,7 +122,7 @@ exports.forgotPassword = AsyncCatch(async (req, res, next) => {
     await mail({
       email,
       subject: 'activate your account',
-      message,
+      message
     });
     res.status(200).json({ status: 'success', message: 'check your email' });
   } catch (error) {
@@ -132,11 +131,37 @@ exports.forgotPassword = AsyncCatch(async (req, res, next) => {
     return next(
       new ErrorHandler({
         message: 'email not send try later!',
-        statusCode: 500,
+        statusCode: 500
       })
     );
   }
 });
 exports.resetPassword = AsyncCatch(async (req, res, next) => {
-  console.log(req);
+  const { token } = req.params;
+  const { password, confirmPassword } = req.body;
+  (!password || !confirmPassword) && next(new ErrorHandler({
+    message: 'Please provide password and password confirmation',
+    statusCode: 400
+  }));
+  // encrypt token and check if exist or not
+  const encryptedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  console.log(encryptedToken);
+  let user = await userModel.findOne({ resetToken: encryptedToken, resetTokenExpiration: { $gt: Date.now() } });
+  if (!user) {
+    next(new ErrorHandler({ message: 'token is invalid or expired', statusCode: 400 }));
+  }
+  user.resetToken = user.resetTokenExpiration = undefined;
+  user.updatePasswordAt = Date.now();
+  user.password = password;
+  user.confirmPassword = confirmPassword;
+  console.log(user);
+  const newUser = await user.save();
+  const jwtToken = await generateToken(newUser._id);
+  res.status(201).json({
+    status: 'success',
+    token: jwtToken
+  });
 });

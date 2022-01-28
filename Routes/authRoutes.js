@@ -4,5 +4,6 @@ const router = express.Router();
 router.route('/signup').post(signup);
 router.route('/login').post(login);
 router.route('/forget-password').post(forgotPassword);
-router.route('/reset-password').post(resetPassword);
+// we use patch because we need to change some fields
+router.route('/reset-password/:token').patch(resetPassword);
 module.exports = router;
