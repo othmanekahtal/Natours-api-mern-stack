@@ -168,6 +168,7 @@ exports.updatePassword = AsyncCatch(async (req, res, next) => {
     }));
 
   }
+  user.updatePasswordAt = Date.now();
   user.password = password;
   user.passwordConfirm = passwordConfirm;
   await user.save();
