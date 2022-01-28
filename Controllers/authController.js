@@ -159,9 +159,17 @@ exports.resetPassword = AsyncCatch(async (req, res, next) => {
   sendTokenResponse(res, user, 200);
 });
 exports.updatePassword = AsyncCatch(async (req, res, next) => {
-  const { id, password, passwordConfirm, passwordCurrent } = req.body;
+  console.log(req.body);
+  const {
+    user: { id },
+    body: {
+      password, confirmPassword, passwordCurrent
+    }
+  } = req;
   const user = await userModel.findById(id).select('+password');
-  if (!(await user.correctPassword(passwordCurrent, user.password))) {
+  console.log(passwordCurrent);
+  console.log(user.password);
+  if (!(await user.correctPassword({ candidatePassword: user.password, userPassword: passwordCurrent }))) {
     return next(new ErrorHandler({
       message: 'Your current password is wrong.',
       statusCode: 401
@@ -170,7 +178,7 @@ exports.updatePassword = AsyncCatch(async (req, res, next) => {
   }
   user.updatePasswordAt = Date.now();
   user.password = password;
-  user.passwordConfirm = passwordConfirm;
+  user.confirmPassword = confirmPassword;
   await user.save();
   sendTokenResponse(res, user, 200);
 });

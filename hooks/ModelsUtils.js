@@ -39,7 +39,6 @@ exports.correctPassword = async ({
                                  }) => await bcrypt.compare(userPassword, candidatePassword);
 
 exports.changedAfter = async ({ date }) => {
-  console.log(date);
   if (this.updatePasswordAt) {
     const parsedDate = this.updatePasswordAt.getTime() / 1000;
     return parsedDate > date;
