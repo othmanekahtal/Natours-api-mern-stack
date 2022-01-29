@@ -1,18 +1,21 @@
-const { getAllUsers, createUser, getUser, updateUser, deleteUser } = require('../Controllers/userController');
+const {
+  getAllUsers,
+  createUser,
+  getUser,
+  updateUser,
+  deleteUser,
+} = require('../Controllers/userController');
+const { protect } = require('./../Controllers/authController');
 const express = require('express');
 const router = express.Router();
-// router.param('id', (request, response, next, value) => {
-//   console.log(`id is :${value}`);
-// });
+
 router
   .route('/')
   .get(getAllUsers)
-  .post(createUser);
+  .post(createUser)
+  .patch(protect, updateUser)
+  .delete(protect, deleteUser);
 
-router
-  .route('/:id/')
-  .get(getUser)
-  .patch(updateUser)
-  .delete(deleteUser);
+router.route('/:id/').get(getUser);
 
 module.exports = router;
