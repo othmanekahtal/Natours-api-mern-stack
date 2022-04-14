@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 dotenv.config({ path: './.env' });
 const port = process.env.PORT || 8080;
 process.on('uncaughtException', (error) => {
+  console.log(error);
   console.log(`${error.name} : ${error.message}`);
   process.exit(1);
 });

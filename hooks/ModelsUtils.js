@@ -4,6 +4,11 @@ const slugify = require('slugify');
 const { Schema } = require('mongoose');
 const { password } = require('./ModelsUtils');
 exports.find = function (next) {
+  this.populate({
+    path: 'guides',
+    select:
+      '-__v -passwordChangedAt -passwordResetToken -passwordResetExpires -role -createdAt -updatedAt -updatePasswordAt',
+  });
   this.find({ secretTour: { $ne: true } });
   next();
 };

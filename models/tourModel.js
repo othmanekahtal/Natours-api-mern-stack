@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const { slug, find, aggregate } = require('../hooks/ModelsUtils');
+const { slug, find, aggregate, getUsers } = require('../hooks/ModelsUtils');
 // we need to getting schema class in mongoose:
 const tourSchema = new Schema(
   {
@@ -62,6 +62,31 @@ const tourSchema = new Schema(
       type: String,
       trim: true,
     },
+    startLocation: {
+      // GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    location: [
+      {
+        // GeoJSON
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        day: Number,
+        description: String,
+      },
+    ],
     imageCover: {
       type: String,
       required: [true, 'A tour must have a cover image'],
@@ -73,6 +98,15 @@ const tourSchema = new Schema(
       // to ignore the selection the created at in select
       select: false,
     },
+    // guides: [mongoose.Types.ObjectId],
+    // guides: Array,
+    guides: [
+      {
+        // define the relationship between tour and user
+        type: mongoose.Schema.ObjectId,
+        ref: 'user',
+      },
+    ],
     startDates: [Date],
     secretTour: {
       type: Boolean,
@@ -96,4 +130,15 @@ tourSchema.pre('save', slug);
 tourSchema.pre(/^find/, find);
 // we need to create a model : mongodb we automatically create a collection using plural of the TourModel and convert them to lowercase
 tourSchema.pre('aggregate', aggregate);
+// why we don't use embeded document in tour model?
+// because we need to update a collection for each user update profile also if user deleted we need to check all tours and delete this user from all tours , it's a lot of work
+
+// responsible for embedding the user in the tour
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map((guide) => userModel.findById(guide));
+//   this.guides = await Promise.all(guidesPromises);
+//   console.log(this.guides);
+//   next();
+// });
+
 module.exports = mongoose.model('tour', tourSchema);
