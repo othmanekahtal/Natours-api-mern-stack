@@ -89,6 +89,6 @@ server.use(errorHandle);
 /**
  * @type {*|Express}
  * if we pass any parameter to next() function automatically express will know that was an error
- * when we pass param to next() express skip all middlewares in stack to the error handler
+ * when we pass param to next() express skip all middleware in stack to the error handler
  */
 module.exports = server;
