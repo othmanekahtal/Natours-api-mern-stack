@@ -8,11 +8,11 @@ const hpp = require('hpp');
 const server = express();
 const Tours = require('./Routes/toursRoutes');
 const Users = require('./Routes/usersRoutes');
+const { reviewRouter } = require('./Routes/reviewRoutes');
 const Auth = require('./Routes/authRoutes');
 const { protect } = require('./Controllers/authController');
 const errorHandler = require('./utils/errorHandler');
 const errorHandle = require('./Controllers/globalErrorHandler');
-
 // if cycle not finished yet At this moment , we have a router that handled in the previous middlewares
 /**
  * all == all verbs put,delete,patch,get,post
@@ -71,6 +71,8 @@ server.use((req, res, next) => {
 
 server.use('/api/v1/tours', protect, Tours);
 server.use('/api/v1/users', Users);
+server.use('/api/v1/reviews', reviewRouter);
+
 server.use('/api/v1', Auth);
 
 server.all('*', function (req, res, next) {
