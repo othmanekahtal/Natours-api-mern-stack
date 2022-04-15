@@ -8,6 +8,9 @@ exports.find = function (next) {
     path: 'guides',
     select:
       '-__v -passwordChangedAt -passwordResetToken -passwordResetExpires -role -createdAt -updatedAt -updatePasswordAt',
+  }).populate({
+    path: 'reviews',
+    select: '-__v -createdAt -updatedAt',
   });
   this.find({ secretTour: { $ne: true } });
   next();

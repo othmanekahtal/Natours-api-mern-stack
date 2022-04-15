@@ -69,11 +69,10 @@ server.use((req, res, next) => {
   next();
 });
 
-server.use('/api/v1/tours', protect, Tours);
+server.use('/api/v1', Auth);
 server.use('/api/v1/users', Users);
 server.use('/api/v1/reviews', reviewRouter);
-
-server.use('/api/v1', Auth);
+server.use('/api/v1/tours', protect, Tours);
 
 server.all('*', function (req, res, next) {
   next(
@@ -88,9 +87,4 @@ server.all('*', function (req, res, next) {
 we create a central middleware for handle all errors
  */
 server.use(errorHandle);
-/**
- * @type {*|Express}
- * if we pass any parameter to next() function automatically express will know that was an error
- * when we pass param to next() express skip all middleware in stack to the error handler
- */
 module.exports = server;

@@ -35,6 +35,7 @@ exports.createTour = asyncCatch(async (request, response) => {
 exports.getTour = asyncCatch(async (request, response, next) => {
   const id = request.params.id;
   const res = await tourModel.findById(id);
+  console.log(res);
   // findById only for getting data with ID, we have also findOne
   if (!res)
     return next(

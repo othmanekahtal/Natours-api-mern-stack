@@ -58,7 +58,7 @@ const userSchema = new Schema({
   resetToken: String,
   resetTokenExpiration: Date,
   updatePasswordAt: Date,
-  photo: {
+  imageCover: {
     type: String,
     required: [true, 'An user must have a cover image'],
   },

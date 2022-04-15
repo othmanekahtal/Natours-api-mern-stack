@@ -124,6 +124,12 @@ const tourSchema = new Schema(
 tourSchema.virtual('duration-week').get(function () {
   return this.duration / 7;
 });
+// virtual populate
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
 // we add slug to the model
 tourSchema.pre('save', slug);
 // anything start with find (findOne,findByID etc...)
