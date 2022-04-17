@@ -71,7 +71,7 @@ server.use((req, res, next) => {
 server.use('/api/v1', Auth);
 server.use('/api/v1/users', Users);
 server.use('/api/v1/reviews', reviewRouter);
-server.use('/api/v1/tours', protect, Tours);
+server.use('/api/v1/tours', Tours);
 
 server.all('*', function (req, res, next) {
   next(
