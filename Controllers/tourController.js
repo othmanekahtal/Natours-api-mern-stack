@@ -18,7 +18,7 @@ exports.getAllTours = asyncCatch(async (request, response) => {
     .limitFields()
     .paginate();
   const tours = await prep.query;
-  console.log(tours);
+
   response
     .status(200)
     .json({ status: 'success', result: tours.length, data: tours });
@@ -35,7 +35,7 @@ exports.createTour = asyncCatch(async (request, response) => {
 exports.getTour = asyncCatch(async (request, response, next) => {
   const id = request.params.id;
   const res = await tourModel.findById(id);
-  console.log(res);
+
   // findById only for getting data with ID, we have also findOne
   if (!res)
     return next(
@@ -94,7 +94,7 @@ exports.getStats = asyncCatch(async (request, response) => {
 
 exports.getMonthlyPlan = asyncCatch(async (req, res) => {
   const year = +req.params.year;
-  console.log(year);
+
   let data = await tourModel.aggregate([
     { $unwind: '$startDates' },
     {

@@ -24,7 +24,7 @@ exports.slug = function (next) {
 // before aggregate, we need to execute all VIP or secret tours
 exports.aggregate = function (next) {
   // to get all pipeline here
-  console.log(this.pipeline());
+
   this.pipeline().unshift({
     $match: {
       secretTour: { $ne: true },

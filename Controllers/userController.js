@@ -24,7 +24,7 @@ exports.getAllUsers = asyncCatch(async (req, res, next) => {
 });
 
 exports.createUser = (request, response) => {
-  // console.log(request.body);
+  //
   response.status(500).json({
     message: 'failed',
     result: '<route not define yeat>',

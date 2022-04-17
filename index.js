@@ -65,7 +65,6 @@ server.use(express.static(`${__dirname}/public`));
 // Test middleware
 server.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  // console.log(req.headers);
   next();
 });
 

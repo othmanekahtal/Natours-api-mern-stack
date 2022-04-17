@@ -160,7 +160,7 @@ exports.resetPassword = AsyncCatch(async (req, res, next) => {
     .createHash('sha256')
     .update(token)
     .digest('hex');
-  console.log(encryptedToken);
+
   let user = await userModel.findOne({
     resetToken: encryptedToken,
     resetTokenExpiration: { $gt: Date.now() },
@@ -181,7 +181,6 @@ exports.resetPassword = AsyncCatch(async (req, res, next) => {
   sendTokenResponse(res, user, 200);
 });
 exports.updatePassword = AsyncCatch(async (req, res, next) => {
-  console.log(req.body);
   const {
     user: { id },
     body: { password, confirmPassword, passwordCurrent },

@@ -143,7 +143,7 @@ tourSchema.pre('aggregate', aggregate);
 // tourSchema.pre('save', async function (next) {
 //   const guidesPromises = this.guides.map((guide) => userModel.findById(guide));
 //   this.guides = await Promise.all(guidesPromises);
-//   console.log(this.guides);
+//
 //   next();
 // });
 

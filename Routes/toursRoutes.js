@@ -13,7 +13,6 @@ const { reviewRouter } = require('./reviewRoutes');
 const router = express.Router();
 
 router.param('id', (req, res, next, value) => {
-  console.log(`the id is ${value}`);
   next();
 });
 router.use('/:tourId/reviews', reviewRouter);
