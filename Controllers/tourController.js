@@ -1,7 +1,12 @@
 const tourModel = require('../models/tourModel');
-const QueryHandler = require('../utils/queryHandler');
-const errorHandler = require('../utils/errorHandler.js');
 const asyncCatch = require('../utils/asyncCatch');
+const {
+  deleteOne,
+  updateOne,
+  getOne,
+  getAll,
+  createOne,
+} = require('./handleFactory');
 // we need to exclude some fields in query like a page and limit and ...
 
 /*
@@ -11,63 +16,11 @@ const asyncCatch = require('../utils/asyncCatch');
  * TO HIDE FIELDS YOU NEED TO ADD SELECT:FALSE IN MODEL
  * always add await when you interact with mongodb
  */
-exports.getAllTours = asyncCatch(async (request, response) => {
-  let prep = new QueryHandler(tourModel.find(), request.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tours = await prep.query;
-
-  response
-    .status(200)
-    .json({ status: 'success', result: tours.length, data: tours });
-});
-
-exports.createTour = asyncCatch(async (request, response) => {
-  const new_tour = await tourModel.create(request.body);
-  response.status(201).json({
-    status: 'success',
-    data: new_tour,
-  });
-});
-
-exports.getTour = asyncCatch(async (request, response, next) => {
-  const id = request.params.id;
-  const res = await tourModel.findById(id);
-
-  // findById only for getting data with ID, we have also findOne
-  if (!res)
-    return next(
-      new errorHandler({ message: 'ID Not found !', statusCode: 404 })
-    );
-  response.status(200).json({ status: 'success', data: res });
-});
-
-exports.updateTour = asyncCatch(async (request, response, next) => {
-  const id = request.params.id;
-  const res = await tourModel.findByIdAndUpdate(id, request.body, {
-    new: true,
-    runValidators: true,
-  });
-  if (!res)
-    return next(
-      new errorHandler({ message: 'ID Not found !', statusCode: 404 })
-    );
-  // findById only for getting data with ID,we have also findOne
-  response.status(200).json({ status: 'success', data: res });
-});
-
-exports.deleteTour = asyncCatch(async (request, response, next) => {
-  const id = request.params.id;
-  const res = await tourModel.findByIdAndDelete(id);
-  if (!res)
-    return next(
-      new errorHandler({ message: 'ID Not found !', statusCode: 404 })
-    );
-  // findById only for getting data with Id, we have also findOne
-  response.status(204).send(null);
-});
+exports.getAllTours = getAll({ model: tourModel });
+exports.createTour = createOne({ model: tourModel });
+exports.getTour = getOne({ model: tourModel });
+exports.updateTour = updateOne({ model: tourModel });
+exports.deleteTour = deleteOne({ model: tourModel });
 exports.getTopAlias = async (req, res, next) => {
   req.query.limit = 5;
   req.query.order = 'price,-ratingsAverage';

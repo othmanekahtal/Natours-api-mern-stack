@@ -1,6 +1,7 @@
 const userModel = require('../models/userModel');
 const asyncCatch = require('../utils/asyncCatch');
 const ErrorHandler = require('../utils/errorHandler');
+const { deleteOne, getOne, getAll } = require('./handleFactory');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -10,21 +11,9 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getAllUsers = asyncCatch(async (req, res, next) => {
-  const users = await userModel.find();
-
-  // SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users,
-    },
-  });
-});
+exports.getAllUsers = getAll({ model: userModel });
 
 exports.createUser = (request, response) => {
-  //
   response.status(500).json({
     message: 'failed',
     result: '<route not define yeat>',
@@ -34,19 +23,7 @@ exports.createUser = (request, response) => {
   });
 };
 
-exports.getUser = (request, response) => {
-  // implementation :
-  /**
-   * if id is in the array we return it if not we send nit found code page
-   */
-  response.status(500).json({
-    message: 'failed',
-    result: '<route not define yeat>',
-    /**
-     * This is optional only in array with multiple elements (objects)
-     */
-  });
-};
+exports.getUser = getOne({ model: userModel });
 
 exports.updateUser = asyncCatch(async (req, res, next) => {
   // 1) Create error if user POSTs password data
@@ -81,7 +58,7 @@ exports.updateUser = asyncCatch(async (req, res, next) => {
   });
 });
 
-exports.deleteUser = asyncCatch(async (req, res, next) => {
+exports.deleteMe = asyncCatch(async (req, res, next) => {
   await userModel.findByIdAndUpdate(req.user.id, { active: false });
 
   res.status(204).json({
@@ -89,6 +66,8 @@ exports.deleteUser = asyncCatch(async (req, res, next) => {
     data: null,
   });
 });
+
+exports.deleteUser = deleteOne({ model: userModel });
 
 exports.getUser = (req, res) => {
   res.status(500).json({
