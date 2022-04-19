@@ -1,6 +1,5 @@
 const asyncCatch = require('../utils/asyncCatch');
 const QueryHandler = require('../utils/queryHandler');
-
 const errorHandler = require('../utils/errorHandler');
 exports.deleteOne = ({ model }) =>
   asyncCatch(async (request, response, next) => {
@@ -55,13 +54,13 @@ exports.getOne = ({ model }) =>
 exports.getAll = ({ model }) =>
   asyncCatch(async (request, response) => {
     const filter = {};
-    if (req.params.tourId) filter.tour = req.params.tourId;
-    let prep = new QueryHandler(tourModel.find(filter), request.query)
+    if (request.params.tourId) filter.tour = request.params.tourId;
+    let prep = new QueryHandler(model.find(filter), request.query)
       .filter()
       .sort()
       .limitFields()
       .paginate();
-    const docs = await prep.query;
+    const docs = await prep.query.explain();
     response
       .status(200)
       .json({ status: 'success', result: docs.length, data: docs });

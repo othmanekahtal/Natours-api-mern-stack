@@ -21,6 +21,6 @@ router.delete('/me/delete', protect, deleteMe);
 router.use(onlyFor('admin'));
 
 router.route('/').get(getAllUsers).post(createUser);
-router.route('/:id/').get(getUser).delete(deleteUser).path(updateUser);
+router.route('/:id/').get(getUser).delete(deleteUser).patch(updateUser);
 
 module.exports = router;

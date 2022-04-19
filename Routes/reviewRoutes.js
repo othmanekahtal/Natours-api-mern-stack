@@ -4,6 +4,7 @@ const {
   deleteReview,
   updateReview,
   setTourUserIds,
+  getReview,
 } = require('../Controllers/reviewController');
 const express = require('express');
 // when we set the mergeParams: true, we can access the tourId from the params

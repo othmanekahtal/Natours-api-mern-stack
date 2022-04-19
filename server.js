@@ -1,10 +1,9 @@
 const dotenv = require('dotenv');
-const mongoose = require('mongoose');
 dotenv.config({ path: './.env' });
+const mongoose = require('mongoose');
 const port = process.env.PORT || 8080;
+const server = require('./index');
 process.on('uncaughtException', (error) => {
-  
-  
   process.exit(1);
 });
 const database = process.env.HOSTED_DATABASE.replace(
@@ -12,16 +11,13 @@ const database = process.env.HOSTED_DATABASE.replace(
   process.env.DATABASE_PASSWORD
 );
 
-mongoose.connect(database).then(() => 
-const server = require('./index');
+mongoose.connect(database).then(() => console.log('Database connected'));
 const app = server.listen(port, () => {
-  
+  console.log(`Server is running on port ${port}`);
 });
 
 process.on('unhandledRejection', (error) => {
-  
   app.close(() => {
-    
     process.exit(1);
   });
 });

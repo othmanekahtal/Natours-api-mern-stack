@@ -146,5 +146,10 @@ tourSchema.pre('aggregate', aggregate);
 //
 //   next();
 // });
+tourSchema.index({ slug: 1 });
+// you can also add compound index
 
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+
+// to delete index you can't do it in mongoose but you can do it in mongodb manually
 module.exports = mongoose.model('tour', tourSchema);
